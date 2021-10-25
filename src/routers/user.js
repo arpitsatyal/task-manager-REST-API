@@ -2,7 +2,7 @@ const express = require('express')
 const User = require('../models/user')
 const auth = require('../middleware/auth')
 const multer = require('multer')
-const sharp = require('sharp')
+// const sharp = require('sharp')
 const { sendWeclomeMail, sendByeByeMail } = require('../emails/account')
 const router = new express.Router()
 
@@ -11,11 +11,12 @@ router.post('/users/register', async (req, res) => {
 
     try {
         await user.save()
-        sendWeclomeMail(user.email, user.name)
+        // sendWeclomeMail(user.email, user.name)
         const token = await user.generateAuthToken()
         res.status(201).send({ user, token })
-    } catch (e) {
-        res.status(400).send(e)
+    } catch (err) {
+        console.log('ERROR IN SIGNUP', err)
+        res.status(400).send(err)
     }
 })
 
@@ -23,7 +24,7 @@ router.post('/users/login', async (req, res) => {
     try {
         const user = await User.findByCredentials(req.body.email, req.body.password)
         const token = await user.generateAuthToken()
-        res.send({ user, token })
+        res.status(200).send({ user, token })
     } catch (e) {
         res.status(400).send('invalid password.')
     }
@@ -50,7 +51,7 @@ router.post('/users/logoutAll', auth, async (req, res) => {
 })
 
 router.get('/users/profile', auth, async (req, res) => {
-    res.send(req.user)
+    res.status(200).send(req.user)
 })
 
 router.get('/users', async (req, res) => {
@@ -118,16 +119,16 @@ let upload = multer({
     }
 })
 
-router.post('/users/profile/avatar', auth, upload.single('upload'), async (req, res) => {
-    try {
-        const buffer = await sharp(req.file.buffer).resize({ width: 250, height: 250 }).png().toBuffer()
-        req.user.avatar = buffer
-        await req.user.save()
-        res.send()
-    } catch (e) {
-        next({ message: err.message })
-    }
-})
+// router.post('/users/profile/avatar', auth, upload.single('upload'), async (req, res) => {
+//     try {
+//         const buffer = await sharp(req.file.buffer).resize({ width: 250, height: 250 }).png().toBuffer()
+//         req.user.avatar = buffer
+//         await req.user.save()
+//         res.send()
+//     } catch (e) {
+//         next({ message: err.message })
+//     }
+// })
 
 router.get('/users/:id/avatar', auth,  async (req, res) => {
     try {
