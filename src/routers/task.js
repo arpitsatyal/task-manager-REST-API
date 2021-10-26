@@ -45,7 +45,8 @@ router.get('/tasks', auth, async (req, res) => {
             }
         }).execPopulate()
         res.send(req.user.tasks)
-        console.log('logged in user>>', req.user.name)
+        res.status(200).json(tasks)
+        // console.log('logged in user>>', req.user.name)
     } catch (e) {
         res.status(500).send()
     }
@@ -97,7 +98,6 @@ router.delete('/tasks/:id', auth, async (req, res) => {
         }
         await task.save()
         res.send(task)
-        console.log('logged in user>>', req.user.name)
     } catch (e) {
         res.status(500).send()
     }
